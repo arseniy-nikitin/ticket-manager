@@ -5,7 +5,7 @@ services:
         container_name: service-postgres
         image: postgres:12
         environment:
-          - POSTGRES_DB=pg_grpc_service_template_db_1
+          - POSTGRES_DB=ticket_manager_db_1
           - POSTGRES_USER=user
           - POSTGRES_PASSWORD=password
         ports:
@@ -16,24 +16,24 @@ services:
         networks:
           - postgres
 
-    pg_grpc_service_template-container:
+    ticket_manager-container:
         image: ghcr.io/userver-framework/ubuntu-22.04-userver-base-ci:latest
         privileged: true
         environment:
-          - POSTGRES_DB=pg_grpc_service_template_db_1
+          - POSTGRES_DB=ticket_manager_db_1
           - POSTGRES_USER=user
           - POSTGRES_PASSWORD=password
           - PREFIX=${PREFIX:-~/.local}
-          - CCACHE_DIR=/pg_grpc_service_template/.ccache
+          - CCACHE_DIR=/ticket_manager/.ccache
           - CORES_DIR=/cores
         volumes:
-          - .:/pg_grpc_service_template:rw
+          - .:/ticket_manager:rw
           - ./third_party/userver/scripts/docker/:/tools:ro
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080
           - 8081:8081
-        working_dir: /pg_grpc_service_template
+        working_dir: /ticket_manager
         entrypoint:
           - /tools/run_as_user.sh
         depends_on:

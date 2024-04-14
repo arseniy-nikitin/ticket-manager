@@ -31,20 +31,20 @@ build_release/CMakeCache.txt: cmake-release
 # Build using cmake
 .PHONY: build-debug build-release
 build-debug build-release: build-%: build_%/CMakeCache.txt
-	cmake --build build_$* -j $(NPROCS) --target pg_grpc_service_template
+	cmake --build build_$* -j $(NPROCS) --target ticket_manager
 
 # Test
 .PHONY: test-debug test-release
 test-debug test-release: test-%: build-%
-	cmake --build build_$* -j $(NPROCS) --target pg_grpc_service_template_unittest
-	cmake --build build_$* -j $(NPROCS) --target pg_grpc_service_template_benchmark
+	cmake --build build_$* -j $(NPROCS) --target ticket_manager_unittest
+	cmake --build build_$* -j $(NPROCS) --target ticket_manager_benchmark
 	cd build_$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
 	pep8 tests
 
 # Start the service (via testsuite service runner)
 .PHONY: service-start-debug service-start-release
 service-start-debug service-start-release: service-start-%: build-%
-	cmake --build build_$* -v --target start-pg_grpc_service_template
+	cmake --build build_$* -v --target start-ticket_manager
 
 # Cleanup data
 .PHONY: clean-debug clean-release
@@ -60,7 +60,7 @@ dist-clean:
 # Install
 .PHONY: install-debug install-release
 install-debug install-release: install-%: build-%
-	cmake --install build_$* -v --component pg_grpc_service_template
+	cmake --install build_$* -v --component ticket_manager
 
 .PHONY: install
 install: install-release
@@ -73,20 +73,20 @@ format:
 
 # Internal hidden targets that are used only in docker environment
 --in-docker-start-debug --in-docker-start-release: --in-docker-start-%: install-%
-	psql 'postgresql://user:password@service-postgres:5432/pg_grpc_service_template_db_1' -f ./postgresql/data/initial_data.sql
-	/home/user/.local/bin/pg_grpc_service_template \
-		--config /home/user/.local/etc/pg_grpc_service_template/static_config.yaml \
-		--config_vars /home/user/.local/etc/pg_grpc_service_template/config_vars.docker.yaml
+	psql 'postgresql://user:password@service-postgres:5432/ticket_manager_db_1' -f ./postgresql/data/initial_data.sql
+	/home/user/.local/bin/ticket_manager \
+		--config /home/user/.local/etc/ticket_manager/static_config.yaml \
+		--config_vars /home/user/.local/etc/ticket_manager/config_vars.docker.yaml
 
 # Build and run service in docker environment
 .PHONY: docker-start-service-debug docker-start-service-release
 docker-start-service-debug docker-start-service-release: docker-start-service-%:
-	$(DOCKER_COMPOSE) run -p 8080:8080 --rm pg_grpc_service_template-container make -- --in-docker-start-$*
+	$(DOCKER_COMPOSE) run -p 8080:8080 --rm ticket_manager-container make -- --in-docker-start-$*
 
 # Start targets makefile in docker environment
 .PHONY: docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-install-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install-release
 docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-install-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install-release: docker-%:
-	$(DOCKER_COMPOSE) run --rm pg_grpc_service_template-container make $*
+	$(DOCKER_COMPOSE) run --rm ticket_manager-container make $*
 
 # Stop docker container and remove PG data
 .PHONY: docker-clean-data

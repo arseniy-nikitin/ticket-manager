@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(pg_grpc_service_template CXX)
+project(ticket_manager CXX)
 
 # Enable userver libraries that are needed in this project
 set(USERVER_FEATURE_POSTGRESQL ON CACHE BOOL "" FORCE)
