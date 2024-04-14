@@ -35,6 +35,8 @@ target_link_libraries(${PROJECT_NAME}_objs PUBLIC ${PROJECT_NAME}_proto)
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 
+# Without this function tests can't be found
+enable_testing()
 
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest
